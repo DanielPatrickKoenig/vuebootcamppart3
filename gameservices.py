@@ -1,13 +1,12 @@
-
 from flask import Flask
 from flask import jsonify
 from flask import request
-from flask_cors import CORS
+# from flask_cors import CORS
 from gamedata import load_data
 from gamedata import update_data
 
 app = Flask(__name__)
-cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+# cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 @app.route('/')
 def index():
     return '<div id="app"></div><script src="static/dist/build.js"></script>'
