@@ -1,6 +1,7 @@
 <template>
   <div class='search-text'>
-    <input type="text" v-on:keyup="onTextEntered" v-model="searchTerm" placeholder="search..." />
+    <input type="text" v-on:keyup="onTextEntered" v-model="searchTerm" :placeholder="searchprompt" />
+    <slot name="filters" v-if="searchTerm !== ''"></slot>
     <ul>
       <li v-for="(m,i) in matches" :key="i" v-text="m.text" v-bind:match-index="i" v-bind:class="m.listIndex" v-on:click="onSearchTermClicked"></li>
     </ul>
@@ -15,7 +16,7 @@
         matches: []
       }
     },
-    props: ['list', 'exclusions'],
+    props: ['list', 'exclusions', 'searchprompt'],
     methods: {
       onSearchTermClicked: function (e) {
         EventBus.$emit('search-term-clicked', e.currentTarget)

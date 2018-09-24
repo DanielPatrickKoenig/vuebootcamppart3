@@ -40,37 +40,35 @@
               trigger: 'item',
               formatter: '{a} <br/>{b}: {c} ({d}%)'
             },
-            legend: {
-              orient: 'vertical',
-              x: 'left',
-              y: 'center',
-              data: _keys,
-              textStyle: {
-                color: this.textcolor
-              }
-            },
+            // legend: {
+            //   orient: 'vertical',
+            //   x: 'left',
+            //   y: 'center',
+            //   data: _keys,
+            //   textStyle: {
+            //     color: this.textcolor
+            //   }
+            // },
             series: [
               {
                 name: this.hovertitle,
                 type: 'pie',
                 radius: ['50%', '70%'],
-                avoidLabelOverlap: false,
+                selectedMode: 'single',
+                clockwise: true,
                 label: {
                   normal: {
-                    show: false,
-                    position: 'center'
-                  },
-                  emphasis: {
-                    show: true,
                     textStyle: {
-                      fontSize: '30',
-                      fontWeight: 'bold'
+                      fontSize: 12,
+                      color: '#eeeeee'
                     }
                   }
                 },
                 labelLine: {
                   normal: {
-                    show: false
+                    lineStyle: {
+                      color: '#eeeeee'
+                    }
                   }
                 },
                 data: _data

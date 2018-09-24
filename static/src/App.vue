@@ -1,22 +1,44 @@
 <template>
   <div id="app">
-    <div class='main-header'>VUE JS BOOT CAMP</div>
+    <div class='main-header'>
+      <label>
+        Video Game Sales
+        <!-- <ul><li class="gaming-simabout">About</li><li class="gaming-simoptions">Options</li><li class="gaming-simhelp">Help</li></ul> -->
+      </label>
+    </div>
     <div class="charts">
       <barChart :chartdata="comparisondata" :colors="chartColors" :textcolor="chartTextColor" title="Regional Sales"></barChart>
-      <pieChart :chartdata="salesdata" :colors="chartColors" :textcolor="chartTextColor" title="Genres" hovertitle='Global Sales'></pieChart>
       <div class="rating-charts">
-        <label class="ratings-title" v-text="Object.keys(ratings).length === 0 ? '' : 'Critic Ratings'"></label>
-        <ratingChart v-for="(r, k, i) in ratings" :key="i" v-bind:chartdata="r.Critic_Score !== undefined ? r.Critic_Score : 0" v-bind:color="chartColors[0]" v-bind:text="k" v-bind:total="100"></ratingChart>
+        <!-- <label class="ratings-title" v-text="Object.keys(ratings).length === 0 ? '' : 'Critic Ratings'"></label> -->
+        <div slot="userinterface">
+          <searchText :choices="checkChoices" :list="searchableContentFiltered" :exclusions="getExcludeList(selectedTags)" searchprompt="Search by game, system, producer or genre">
+            <checkAll :choices="checkChoices" slot="filters">
+          </checkAll>
+          </searchText>
+          <tagList v-if="selectedTags.length > 0" :tags="selectedTags">
+            <svg class="rating-art" v-for="(s, i) in selectedTags" :key="'tag_'+i.toString()" :slot="'content_'+i.toString()">
+              <defs>
+                <clipPath :id="'mask_'+i.toString()">
+                  <path xmlns="http://www.w3.org/2000/svg" :d="starsPath" fill="transparent" />
+                </clipPath>
+              </defs>
+              <path xmlns="http://www.w3.org/2000/svg" :d="starsPath" />
+              <rect :clip-path="'url(#mask_'+i.toString()+')'" xmlns="http://www.w3.org/2000/svg" x="0" y="0" :width="120*(ratings[s.text].Critic_Score/100)" height="24"></rect>
+            </svg>
+          </tagList>
+        </div>
+        <!-- <ratingChart v-for="(r, k, i) in ratings" :key="i" v-bind:chartdata="r.Critic_Score !== undefined ? r.Critic_Score : 0" v-bind:color="chartColors[0]" v-bind:text="k" v-bind:total="100"></ratingChart> -->
       </div>
+      <pieChart :chartdata="salesdata" :colors="chartColors" :textcolor="chartTextColor" title=" Sales by Genre" hovertitle='Global Sales'></pieChart>
     </div>
-    <uiDrawer>
+    <!-- <uiDrawer>
       <span slot="titletext">FILTERS</span>
       <div slot="userinterface">
         <checkAll :choices="checkChoices"></checkAll>
         <searchText :choices="checkChoices" :list="searchableContentFiltered" :exclusions="getExcludeList(selectedTags)"></searchText>
         <tagList :tags="selectedTags"></tagList>
       </div>
-    </uiDrawer>
+    </uiDrawer> -->
   </div>
 </template>
 
@@ -47,10 +69,10 @@ export default {
       chartColors: ['#00aeef', '#fdc689', '#7cc576', '#f26d7d', '#a186be', '#ec008c', '#c69c6d', '#ed145b', '#f26522', '#acd373', '#aba000', '#f5989d'],
       chartTextColor: '#eeeeee',
       checkChoices: [
-        {text: 'Genres', value: 'genre', selected: true},
-        {text: 'Systems', value: 'system', selected: true},
-        {text: 'Publishers', value: 'publisher', selected: true},
-        {text: 'Games', value: 'game', selected: true}
+        {text: 'Genres', value: 'genre', selected: true, cssClass: 'gaming-simgenre'},
+        {text: 'Systems', value: 'system', selected: true, cssClass: 'gaming-simsystem'},
+        {text: 'Publishers', value: 'publisher', selected: true, cssClass: 'gaming-simpublisher'},
+        {text: 'Games', value: 'game', selected: true, cssClass: 'gaming-simgame'}
       ],
       searchableContent: {},
       searchableContentFiltered: {},
@@ -60,6 +82,7 @@ export default {
       yeardata: {},
       comparisondata: {},
       ratings: {},
+      starsPath: 'M 11.037 0 l 3.411 6.911 l 7.625 1.108 l -5.518 5.379 l 1.303 7.594 l -6.821 -3.585 l -6.821 3.585 l 1.303 -7.594 L 0 8.019 l 7.626 -1.108 L 11.037 0 Z M 32.088 6.911 l -7.625 1.108 l 5.518 5.379 l -1.302 7.594 l 6.82 -3.585 l 6.821 3.585 l -1.303 -7.594 l 5.518 -5.379 l -7.626 -1.108 L 35.498 0 L 32.088 6.911 Z M 56.55 6.911 l -7.626 1.108 l 5.519 5.379 l -1.303 7.594 l 6.821 -3.585 l 6.82 3.585 l -1.302 -7.594 l 5.518 -5.379 l -7.626 -1.108 L 59.96 0 L 56.55 6.911 Z M 81.012 6.911 l -7.627 1.108 l 5.52 5.379 l -1.304 7.594 l 6.821 -3.585 l 6.82 3.585 l -1.303 -7.594 l 5.518 -5.379 l -7.625 -1.108 L 84.423 0 L 81.012 6.911 Z M 105.474 6.911 l -7.627 1.108 l 5.519 5.379 l -1.302 7.594 l 6.82 -3.585 l 6.821 3.585 l -1.304 -7.594 l 5.52 -5.379 l -7.626 -1.108 L 108.884 0 L 105.474 6.911 Z',
       onUpdateSim: function (d) {
         var splitter = ':::'
         var _params = {}
@@ -80,7 +103,7 @@ export default {
           d.yeardata = dta.years
           d.comparisondata = dta.subset
           d.ratings = dta.ratings
-          console.log(d.comparisondata)
+          console.log(d.ratings)
         })
       }
     }
@@ -183,21 +206,24 @@ div.search-text{
   margin-top:-5px;
   > input[type='text']{
     display:block;
-    width:100%;
+    width:94%;
     max-width:770px;
     height:30px;
-    font-size:28px;
+    font-size:12px;
     font-weight:bold;
     border:none;
-    border-radius:4px;
-    box-shadow: 0 0 4px rgba(0, 0, 0, .3) inset;
-    padding:0 5px;
+    border-radius:68px;
+    box-shadow: 0 0 4px #0afff1 inset;
+    padding:0 12px;
+    background-color: rgba(0,0,0,.5);
+    color: #0afff1;
+    outline: none;
   }
-  > ul{
+  > ul:not(.check-all){
     position:absolute;
     max-height:300px;
     overflow:auto;
-    width:100%;
+    width:60%;
     margin:0;
     padding:0;
     > li{
@@ -208,6 +234,7 @@ div.search-text{
       font-weight:bold;
       font-size:12px;
       text-align: left;
+      padding-left:25px;
     }
   }
 }
@@ -215,31 +242,35 @@ div.search-text{
 div.search-text > ul > li,
 ul.check-all > li{
   display:block;
-    
 }
 
 ul.tag-list{
-  width:400px;
+  width:35%;
+  float: right;
   > li {
-    display:inline;
+    display:block;
     float:left;
     padding:1px 8px 3px 8px;
-    background-color:#ffff00;
-    border-radius:100px;
+    background-color:transparent;
+    border-radius:0px;
     margin:2px;
     color:$textColor;
+    width: 92%;
 
     > span:first-child{
-      font-family:Arial;
-      font-weight:bold;
-      font-size:12px;
+      font-family: Arial;
+      font-weight: 700;
+      font-size: 12px;
+      padding-left: 22px;
+      padding-top: 1px;
+      display: inline-block;
+      max-width: 170px;
     }
 
-    > span:last-child{
+    > span:not(:first-child){
       display: inline-block;
       background-color: transparent;
-      color: $textColor;
-      box-shadow: 0 0 0px 1px #ffffff inset;
+      color: #ff0000;
       border-radius: 20px;
       width: 15px;
       height: 16px;
@@ -248,18 +279,39 @@ ul.tag-list{
       margin-top: -1px !important;
       text-align:center;
       cursor:pointer;
+      float:right;
     }
 
-    > span:last-child::before{
+    > span:not(:first-child)::before{
       content:'\2716';
       text-align: center;
     }
   } 
 }
 
+ul.tag-list > li{
+  background-size: 27px 27px;
+  box-shadow:0 1px 0 rgba(10,241,255,.3);
+}
+
+ul.check-all > li{
+  background-size: 24px 24px;
+}
+
+div.search-text ul:not(.check-all) > li{
+  background-size: 22px 22px;
+  box-shadow:0 1px 0 rgba(10,241,255,.3);
+}
+
 ul.tag-list,
 ul.check-all,
 div.search-text ul{
+  overflow-x: hidden;
+  >li {
+    background-position: 1px 1px;
+    background-repeat: no-repeat;
+  }
+  /*
   > li.genre{
     background-color:$genreColor;
   }
@@ -272,6 +324,7 @@ div.search-text ul{
   > li.game{
     background-color:$gameColor;
   }
+  */
 }
 
 ul.check-all,
@@ -285,11 +338,11 @@ div.pie-chart,
 div.line-chart,
 div.bar-chart{
   display:inline;
-  float:left;
+  float: right;
 }
 div.pie-chart > div{
-  width:750px;
-  height:500px;
+  width:500px;
+  height:400px;
 }
 
 div.line-chart > div,
@@ -333,7 +386,6 @@ div.ui-drawer{
   }
   > label > span{
     margin:0 10px;
-    font-weight:bold;
     font-size:14px;
     font-family:Arial;
   }
@@ -387,33 +439,48 @@ ul.check-all{
   > li:last-child{
     border-radius:0 50px 50px 0;
   }
+  > li:not(:last-child){
+    box-shadow:-9px 0 0 #000000 inset, -10px 0 0 rgba(10,255,241,.4) inset;
+  }
   > li{
     float:left;
     margin-top:4px;   
-    width:195px; 
+    width:104px; 
     color:$textColor;
     font-family:Arial;
     font-weight:bold;
-    text-align:center;
+    text-align:left;
     padding:5px 0;
-    box-shadow:0 0 0 1px #ffffff inset;
+    font-size:12px;
     input[type='checkbox']{
       display:none;
+    }
+    > label {
+      padding-left: 28px;
     }
   }
 }
 
 ul.tag-list{
-    margin-top:-40px;
-    max-height:340px;
-    overflow-y:auto;
-
+  max-height: 340px;
+  position: absolute;
+  width: 245px;
+  z-index: 100;
+  right: 0;
+  overflow-y: auto;
+  top: 33px;
+  min-height: 340px;
+  box-shadow: -1px 0 0 rgba(10,241,255,.3)
 }
 
 div.rating-charts{
-  width:450px;
+  width:700px;
   display: inline-block;
   text-align: left;
+  margin-top:12px;
+  position: relative;
+  height:374px;
+  box-shadow: 1px 0 0 rgba(10,241,255,.3);
   > div.rating-chart{
     margin: 6px 0;
     border-radius: 0 20px 20px 0;
@@ -447,5 +514,37 @@ div.main-header{
   color:#000000;
   padding:10px 0;
   margin-bottom:10px;
+  > label {
+    max-width:1200px;
+    margin: 0 auto;
+    display:block;
+    text-align: left;
+    > ul{
+      float: right;
+      display: block;
+      padding: 0;
+      margin: 0 auto;
+      > li{
+        float: left;
+        margin: 0 8px;
+        display:block;
+        font-size: 14px;
+        color: #bdf610;
+      }
+    }
+  }
+}
+svg.rating-art{
+  width: 196px;
+  height: 24px;
+  margin-left: 22px;
+  margin-top: 2px;
+  path{
+    fill:rgba(255,255,255,.2);
+  }
+  rect{
+    fill:#eeda00;
+    stroke: transparent;
+  }
 }
 </style>
