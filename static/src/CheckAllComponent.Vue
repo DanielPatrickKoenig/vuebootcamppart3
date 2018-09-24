@@ -3,8 +3,11 @@
     <li v-for="(c, i, k) in choices" :key="k" v-bind:class="c.value" v-bind:style="c.selected ? '' : 'opacity:.5;'">
       <label style="width:100%; display:block;">
         <input type="checkbox" v-model="c.selected" v-bind:value="c.value" v-on:change="onCheckChange" />
-        <span v-text="c.text">
-        </span>
+        <slot name="'choice_'+i.toString()">
+          <span v-text="c.text">
+            
+          </span>
+        </slot>
       </label>
     </li>
   </ul>
